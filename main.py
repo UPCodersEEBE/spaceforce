@@ -4,16 +4,20 @@ from moon import Moon
 
 pygame.init()
 
+pygame.font.init()
+myfont = pygame.font.SysFont("Comic Sans MS", 30)
+
 WHITE1 = (255, 255, 255)
 WHITE2 = (190, 190, 190)
 WHITE3 = (45, 45, 45)
 BLACK = (0, 0, 0)
 LIGHTBLUE = (0, 176, 240)
 
-x, y = 400, 260
+x, y = 000, 500
+vx, vy = 1, 0
 
-screen_width, screen_height = 480, 320
-scaling_factor = 2
+screen_width, screen_height = 800, 600
+scaling_factor = 1
 
 pygame.init()
 win = pygame.display.set_mode(
@@ -22,12 +26,12 @@ win = pygame.display.set_mode(
 screen = pygame.Surface((screen_width, screen_height))
 
 # (x,y,radi)
-all_moons = [(240, 160, 20), (140, 300, 100)]
+all_moons = [(240, 400, 20), (240, 601, 30)]
 
 
 def get_forces():
     fx = 0
-    fy = 0
+    fy = -1
     stop = False
     for moon in all_moons:
         ax = moon[0] - x
@@ -44,13 +48,15 @@ def get_forces():
 
 run = True
 while run:
-    pygame.time.delay(32)
+    pygame.time.delay(16)
 
     fx, fy, stop = get_forces()
 
     if stop == False:
-        x += fx
-        y += fy
+        vx += fx / 10
+        vy += fy / 10
+        x += vx
+        y += vy
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -73,5 +79,6 @@ while run:
     pygame.draw.rect(screen, (0, 100, 255), (x, y, 5, 5))
 
     win.blit(pygame.transform.scale(screen, win.get_rect().size), (0, 0))
+    win.blit(screen, myfont.render("Some Text", False, (0, 0, 0)), (0, 0))
     pygame.display.update()
 pygame.quit()
