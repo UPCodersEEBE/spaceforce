@@ -1,7 +1,5 @@
 import pygame
 
-BLACK = (0, 0, 0)
-
 
 class Moon(pygame.sprite.Sprite):
     # This class represents a brick. It derives from the "Sprite" class in Pygame.
