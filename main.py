@@ -1,35 +1,48 @@
 import pygame
 import math
 from moon import Moon
+import random
 
 pygame.init()
-font = pygame.font.SysFont("8-Bit-Madness", 15, True, False)
+font = pygame.font.SysFont("8-Bit-Madness", 35, True, False)
 
 
-WHITE1 = (255, 255, 255)
-WHITE2 = (190, 190, 190)
-WHITE3 = (45, 45, 45)
-EXPLOSION = (200, 20, 20)
-BLACK = (0, 0, 0)
-LIGHTBLUE = (0, 176, 240)
-ball_color = LIGHTBLUE
+darker = (34, 30, 49)
+dark = (65, 72, 93)
+light = (119, 142, 152)
+lighter = (197, 129, 212)
+outline = (255, 255, 239)
 
-x, y = 000, 50
-vx, vy = 0, 5
-rad = 3
-av = 2
+x, y = 0, 0
+vx, vy = 0, 0
+rad = 8
+av = 0.2
+maxv = 5
 
 screen_width, screen_height = 240, 160
-scaling_factor = 4
+scaling_factor = 5
 
-pygame.init()
 win = pygame.display.set_mode(
     (screen_width * scaling_factor, screen_height * scaling_factor)
 )
 screen = pygame.Surface((screen_width, screen_height))
 
+ship = pygame.image.load("./assets/ship.png").convert_alpha()
+dock = pygame.image.load("./assets/dock.png").convert_alpha()
+moon_img = pygame.image.load("./assets/moon.png").convert_alpha()
 # (x,y,radi)
-all_moons = [(240, 40, 20), (100, 130, 30)]
+all_moons = [
+    (220, 100, 10),
+]
+
+for i in range(2):
+    all_moons.append(
+        (random.randint(50, 180), random.randint(50, 160), random.randint(10, 25))
+    )
+
+stars = []
+for i in range(80):
+    stars.append([random.random() * screen_width, random.random() * screen_height])
 
 
 def get_forces():
@@ -40,30 +53,29 @@ def get_forces():
         ax = moon[0] - x
         ay = moon[1] - y
         m = 1 * moon[2] ** 3 / 30
-        f = m * 10 / (ax ** 2 + ay ** 2)
+        f = rad * m * 0.25 / (ax ** 2 + ay ** 2)
         o = math.atan(ay / ax)
         fx += f * abs(math.cos(o)) * ax / abs(ax)
         fy += f * abs(math.sin(o)) * ay / abs(ay)
-        if abs(ay) - rad < moon[2] and abs(ax) - rad < moon[2]:
+        if (ay ** 2 + ax ** 2) ** 0.5 < moon[2] + rad:
             stop = True
     return fx, fy, stop
 
 
+camera = 0
 run = True
 while run:
-    pygame.time.delay(100)
+    screen.fill(darker)
+    pygame.time.delay(50)
     fx, fy, stop = get_forces()
-
+    camera += 0.25
+    if camera > screen_width:
+        camera = 0
     if stop:
         vx, vy = 0, 0
-        rad += 1
-        ball_color = EXPLOSION
-        if rad >= 15:
-            run = False
-            rad = 0
     else:
-        vx += fx
-        vy += fy
+        vx = min(fx + vx, maxv)
+        vy = min(fy + vy, maxv)
         x += vx
         y += vy
 
@@ -76,19 +88,44 @@ while run:
         vy -= av
     if keys[pygame.K_DOWN]:
         vy += av
+    if keys[pygame.K_r]:
+        x, y = 0, 0
+        vx, vy = 0, 0
+        all_moons = [
+            (220, 100, 10),
+        ]
+        for i in range(2):
+            all_moons.append(
+                (
+                    random.randint(50, 180),
+                    random.randint(50, 160),
+                    random.randint(10, 25),
+                )
+            )
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
-    screen.fill(BLACK)
-
+    for i in stars:
+        pygame.draw.circle(
+            screen,
+            outline,
+            (i[0] - camera, i[1]),
+            1,
+        )
+        pygame.draw.circle(
+            screen,
+            outline,
+            (i[0] - camera + screen_width, i[1]),
+            1,
+        )
+    screen.blit(ship, (x - rad, y - rad))
     for i in all_moons:
-        Moon(screen, i[0], i[1], i[2])
-
-    pygame.draw.circle(screen, ball_color, (x, y), rad)
+        Moon(screen, i[0], i[1], i[2], moon_img)
+    screen.blit(dock, (208, 88))
     win.blit(pygame.transform.scale(screen, win.get_rect().size), (0, 0))
-    # text = font.render("Highscore: ", 2, (255, 255, 255))
+    text = font.render("x: " + str(int(x)) + "y: " + str(int(y)), 5, (255, 255, 255))
     # win.blit(text, (10, 10))
     pygame.display.update()
 pygame.quit()
