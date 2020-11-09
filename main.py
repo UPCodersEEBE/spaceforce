@@ -31,14 +31,30 @@ ship = pygame.image.load("./assets/ship.png").convert_alpha()
 dock = pygame.image.load("./assets/dock.png").convert_alpha()
 moon_img = pygame.image.load("./assets/moon.png").convert_alpha()
 # (x,y,radi)
-all_moons = [
-    (220, 100, 10),
-]
 
-for i in range(2):
-    all_moons.append(
-        (random.randint(50, 180), random.randint(50, 160), random.randint(10, 25))
-    )
+
+def generate_moons(n):
+    all_moons = [
+        (220, 100, 10),
+    ]
+    while len(all_moons) < n:
+        new_moon = (
+            random.randint(50, 180),
+            random.randint(50, 160),
+            random.randint(10, 25),
+        )
+        able = True
+        for moon in all_moons:
+            if ((moon[0] - new_moon[0]) ** 2 + (moon[1] - new_moon[1]) ** 2) ** 0.5 <= (
+                moon[2] + new_moon[2] + 2 * rad
+            ):
+                able = False
+        if able:
+            all_moons.append(new_moon)
+    return all_moons
+
+
+all_moons = generate_moons(4)
 
 stars = []
 for i in range(80):
@@ -91,34 +107,22 @@ while run:
     if keys[pygame.K_r]:
         x, y = 0, 0
         vx, vy = 0, 0
-        all_moons = [
-            (220, 100, 10),
-        ]
-        for i in range(2):
-            all_moons.append(
-                (
-                    random.randint(50, 180),
-                    random.randint(50, 160),
-                    random.randint(10, 25),
-                )
-            )
+        all_moons = generate_moons(4)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for i in stars:
-        pygame.draw.circle(
+        pygame.draw.rect(
             screen,
             outline,
-            (i[0] - camera, i[1]),
-            1,
+            (i[0] - camera, i[1], 1, 1),
         )
-        pygame.draw.circle(
+        pygame.draw.rect(
             screen,
             outline,
-            (i[0] - camera + screen_width, i[1]),
-            1,
+            (i[0] - camera + screen_width, i[1], 1, 1),
         )
     screen.blit(ship, (x - rad, y - rad))
     for i in all_moons:
