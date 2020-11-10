@@ -19,8 +19,10 @@ rad = 8
 av = 0.2
 maxv = 5
 
+nmoon = 5
+
 screen_width, screen_height = 240, 160
-scaling_factor = 5
+scaling_factor = 4
 
 win = pygame.display.set_mode(
     (screen_width * scaling_factor, screen_height * scaling_factor)
@@ -54,7 +56,7 @@ def generate_moons(n):
     return all_moons
 
 
-all_moons = generate_moons(4)
+all_moons = generate_moons(nmoon)
 
 stars = []
 for i in range(80):
@@ -71,8 +73,8 @@ def get_forces():
         m = 1 * moon[2] ** 3 / 30
         f = rad * m * 0.25 / (ax ** 2 + ay ** 2)
         o = math.atan(ay / ax)
-        fx += f * abs(math.cos(o)) * ax / abs(ax)
-        fy += f * abs(math.sin(o)) * ay / abs(ay)
+        fx += math.copysign(f * abs(math.cos(o)), ax)
+        fy += math.copysign(f * abs(math.sin(o)), ay)
         if (ay ** 2 + ax ** 2) ** 0.5 < moon[2] + rad:
             stop = True
     return fx, fy, stop
@@ -107,7 +109,10 @@ while run:
     if keys[pygame.K_r]:
         x, y = 0, 0
         vx, vy = 0, 0
-        all_moons = generate_moons(4)
+        all_moons = generate_moons(nmoon)
+    if keys[pygame.K_w]:
+        x, y = 0, 0
+        vx, vy = 0, 0
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -127,7 +132,7 @@ while run:
     screen.blit(ship, (x - rad, y - rad))
     for i in all_moons:
         Moon(screen, i[0], i[1], i[2], moon_img)
-    screen.blit(dock, (208, 88))
+    screen.blit(dock, (208, 87))
     win.blit(pygame.transform.scale(screen, win.get_rect().size), (0, 0))
     text = font.render("x: " + str(int(x)) + "y: " + str(int(y)), 5, (255, 255, 255))
     # win.blit(text, (10, 10))
