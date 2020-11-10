@@ -31,7 +31,7 @@ screen = pygame.Surface((screen_width, screen_height))
 
 ship = pygame.image.load("./assets/ship.png").convert_alpha()
 dock = pygame.image.load("./assets/dock.png").convert_alpha()
-moon_img = pygame.image.load("./assets/moon.png").convert_alpha()
+moon_img = pygame.image.load("./assets/moon4.png").convert_alpha()
 # (x,y,radi)
 
 

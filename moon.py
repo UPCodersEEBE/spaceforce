@@ -18,6 +18,7 @@ class Moon(pygame.sprite.Sprite):
         moon_img = pygame.transform.scale(moon_img, (2 * rad, 2 * rad))
 
         # Draw the brick (a rectangle!)
-        pygame.draw.circle(screen, outline, (x, y), rad + 1)
         pygame.draw.circle(screen, lighter, (x, y), rad)
-        # screen.blit(moon_img, (x - rad, y - rad))
+        screen.blit(moon_img, (x - rad, y - rad))
+        pygame.draw.circle(screen, outline, (x, y), rad + 1, width=2)
+        pygame.draw.circle(screen, lighter, (x, y), rad, width=1)
